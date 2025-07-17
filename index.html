@@ -118,6 +118,42 @@ th, td {
         font-size: 0.875rem;
     }
 }
+
+/* === White-background fallback: force dark text & clearer borders === */
+@media (prefers-color-scheme: light) {
+  #page-calculator .card,
+  #page-calculator .card *,
+  #yearly-forecast table,
+  #lifetime-forecast table,
+  #page-calculator table,
+  #page-lifetime table {
+    color: #1e293b !important; /* slate-800 */
+  }
+  #page-calculator .card h3,
+  #page-calculator .card h4,
+  #page-calculator .card label,
+  #page-calculator .card span,
+  #page-calculator .card div,
+  #page-calculator .card p {
+    color: #1e293b !important;
+  }
+  #yearly-forecast th, #yearly-forecast td,
+  #lifetime-forecast th, #lifetime-forecast td {
+    border-color: rgba(0,0,0,0.25) !important;
+  }
+  .number-badge,
+  .yearly-number,
+  .monthly-number,
+  .daily-number {
+    background: rgba(0,0,0,0.08) !important;
+    color: #111827 !important; /* gray-900 */
+  }
+}
+/* 強制覆蓋機制：若偵測卡片背景實際仍接近 #fff，使用混合模式提高對比 */
+#page-calculator .card {
+  mix-blend-mode: normal;
+}
+
 </style>
 </head>
 <body>
