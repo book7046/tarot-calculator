@@ -1,162 +1,69 @@
+
+
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>塔羅靈數計算器</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔羅靈數計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
 body {
     font-family: 'Noto Sans TC', sans-serif;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: #e2e2e2;
     min-height: 100vh;
 }
-
-/* 深色卡片樣式覆蓋 */
 .card {
-    background: rgba(255,255,255,0.08) !important;
+    background-color: rgba(26, 26, 46, 0.85) !important; /* 深色實底+透明度 */
     color: #ffffff !important;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
-
-/* 將卡片內文字固定白色 */
-.card h3, .card h4, .card span, .card label {
-    color: #ffffff !important;
+.card h2, .card h3, .card h4 {
+    color: #d6bcfa !important; /* 淡紫標題 */
 }
-
 .tab-active {
     background: rgba(255,255,255,0.12);
     border-bottom: 2px solid #9d4edd;
 }
-
 .input-field {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.2);
+    color: #ffffff;
 }
-
 .btn-primary {
     background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%);
-    transition: all 0.3s ease;
+    color: #fff;
 }
-
 .btn-primary:hover {
     background: linear-gradient(135deg, #7b2cbf 0%, #5a189a 100%);
-    transform: translateY(-2px);
 }
-
-.tarot-card {
-    transition: all 0.3s ease;
-}
-
-.tarot-card:hover {
-    transform: translateY(-5px);
-}
-
-table {
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-th, td {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.star {
-    animation: twinkle 1.5s infinite alternate;
-}
-
-@keyframes twinkle {
-    0% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-.number-badge {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: rgba(255,255,255,0.12);
-    color: #fff !important;
+.number-badge, .yearly-number, .monthly-number, .daily-number {
+    background: rgba(255,255,255,0.15);
+    color: #ffffff !important;
     border-radius: 0.25rem;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
+    padding: 0.25rem 0.5rem;
 }
-
-.number-badge:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(157,78,221,0.5);
-    background: rgba(255,255,255,0.25);
-}
-
-.yearly-number, .monthly-number, .daily-number {
-    background: rgba(255,255,255,0.12);
-    color:#fff !important;
-    border-radius:0.25rem;
-    padding-left:0.25rem;
-    padding-right:0.25rem;
-}
-
-/* 表格暗色化 */
-#yearly-forecast table, #lifetime-forecast table {
+table {
     background: rgba(255,255,255,0.03);
-    color:#e2e2e2;
+    color: #ffffff;
 }
-
-/* 表格 hover */
-#greg-forecast tr:hover, #lunar-forecast tr:hover, #lifetime-forecast tr:hover {
+th, td {
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px;
+}
+tr:hover {
     background: rgba(157,78,221,0.15) !important;
 }
-
-/* 手機字級縮小 */
-@media (max-width: 640px) {
-    #yearly-forecast table th,
-    #yearly-forecast table td,
-    #lifetime-forecast table th,
-    #lifetime-forecast table td {
-        font-size: 0.875rem;
-    }
+/* 手機字體縮小 */
+@media(max-width:640px){
+    th,td{font-size:0.875rem;}
 }
-
-/* === White-background fallback: force dark text & clearer borders === */
-@media (prefers-color-scheme: light) {
-  #page-calculator .card,
-  #page-calculator .card *,
-  #yearly-forecast table,
-  #lifetime-forecast table,
-  #page-calculator table,
-  #page-lifetime table {
-    color: #1e293b !important; /* slate-800 */
-  }
-  #page-calculator .card h3,
-  #page-calculator .card h4,
-  #page-calculator .card label,
-  #page-calculator .card span,
-  #page-calculator .card div,
-  #page-calculator .card p {
-    color: #1e293b !important;
-  }
-  #yearly-forecast th, #yearly-forecast td,
-  #lifetime-forecast th, #lifetime-forecast td {
-    border-color: rgba(0,0,0,0.25) !important;
-  }
-  .number-badge,
-  .yearly-number,
-  .monthly-number,
-  .daily-number {
-    background: rgba(0,0,0,0.08) !important;
-    color: #111827 !important; /* gray-900 */
-  }
-}
-/* 強制覆蓋機制：若偵測卡片背景實際仍接近 #fff，使用混合模式提高對比 */
-#page-calculator .card {
-  mix-blend-mode: normal;
-}
-
 </style>
 </head>
-<body>
 <body>
     <div class="container mx-auto px-4 py-8">
         <header class="text-center mb-10">
