@@ -1412,5 +1412,44 @@ document.getElementById('import-file').addEventListener('change', (event) => {
     reader.readAsText(file);
 });
 
-</script></body>
+</script>
+<!-- 防止右鍵、複製、開發者工具 -->
+<style>
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+</style>
+<script>
+// 禁止右鍵
+document.addEventListener("contextmenu", function (e) {
+  e.preventDefault();
+}, false);
+
+// 禁止選取文字
+document.addEventListener("selectstart", function (e) {
+  e.preventDefault();
+}, false);
+
+// 禁止快捷鍵
+document.addEventListener("keydown", function (e) {
+  // F12
+  if (e.key === "F12") {
+    e.preventDefault();
+  }
+  // Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U/S/C
+  if ((e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
+      (e.ctrlKey && (e.key === "U" || e.key === "S" || e.key === "C"))) {
+    e.preventDefault();
+  }
+}, false);
+
+// 清空 console
+console.log = function () {};
+</script>
+
+</body>
 </html>
