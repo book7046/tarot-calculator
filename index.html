@@ -8,1448 +8,309 @@
     <title>塔羅靈數計算器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
-    <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f0e6ff;
-            background-image: radial-gradient(circle at 50% 50%, #f9f4ff 10%, #f0e6ff 30%, #e6d9ff 60%);
-            min-height: 100vh;
-        }
-        .tarot-card {
-            transition: all 0.3s ease;
-        }
-        .tarot-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-        .tab-active {
-            background-color: #8b5cf6;
-            color: white;
-        }
-        .tab {
-            transition: all 0.3s ease;
-        }
-        .tab:hover:not(.tab-active) {
-            background-color: #ddd6fe;
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .tarot-symbol {
-            font-size: 2rem;
-            line-height: 1;
-        }
-        .year-cell {
-            transition: all 0.2s ease;
-        }
-        .year-cell:hover {
-            background-color: #ddd6fe;
-            transform: scale(1.05);
-        }
-    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+    <link rel="stylesheet" href="./css/custom.css">
+
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0d9488">
 </head>
-<body>
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-purple-800 mb-2">塔羅靈數計算器</h1>
-            <p class="text-lg text-purple-600">探索你的命運數字與塔羅牌指引</p>
-        </header>
-
-        <!-- 主要導航 -->
-        <div class="flex justify-center mb-8">
-            <div class="flex space-x-2 bg-white rounded-lg shadow-md p-1">
-                <button class="tab tab-active px-6 py-3 rounded-lg text-lg font-medium" data-tab="calculator">靈數計算</button>
-                <button class="tab px-6 py-3 rounded-lg text-lg font-medium" data-tab="lifetime">一生流年</button>
-                <button class="tab px-6 py-3 rounded-lg text-lg font-medium" data-tab="editor">內容編輯</button>
+<body class="p-4">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="p-6">
+            <h1 class="text-3xl font-bold text-center text-indigo-800 mb-6">塔羅靈數計算器</h1>
+            
+            <!-- 頁籤導航 -->
+            <div class="flex border-b mb-6">
+                <button class="tab active px-6 py-3 font-medium text-lg" data-tab="calculator">靈數計算</button>
+                <button class="tab px-6 py-3 font-medium text-lg" data-tab="lifepath">生命軌跡</button>
+                <button class="tab px-6 py-3 font-medium text-lg" data-tab="editor">內容編輯</button>
             </div>
-        </div>
+            
+            <!-- 靈數計算頁面 -->
+            <div id="calculator" class="tab-content active">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 輸入區域 -->
+                    <div class="bg-indigo-50 p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 text-indigo-700">出生日期</h2>
+                        
+                        <div class="mb-6">
+                            <label class="text-gray-700 mb-2 block">國曆出生日期</label>
+                            <div class="flex gap-2">
+                                <div class="w-1/3 relative">
+                                    <input type="number" id="rocYear" placeholder="民國年" class="w-full p-2 border rounded" min="1" max="150">
+                                    <div class="text-xs text-gray-500 mt-1">民國年</div>
+                                </div>
+                                <div class="w-1/3 relative">
+                                    <input type="number" id="solarMonth" placeholder="月" class="w-full p-2 border rounded" min="1" max="12">
+                                    <div class="text-xs text-gray-500 mt-1">月</div>
+                                </div>
+                                <div class="w-1/3 relative">
+                                    <input type="number" id="solarDay" placeholder="日" class="w-full p-2 border rounded" min="1" max="31">
+                                    <div class="text-xs text-gray-500 mt-1">日</div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2">
+                                <span id="westernYearDisplay" class="font-medium">西元年: -</span>
+                            </div>
+                            <!-- 國曆日期資訊顯示區 -->
+                            <div id="solarDateInfo" class="date-info mt-3 p-3 bg-white rounded-lg border border-indigo-200">
+                                <p class="text-sm text-gray-700">您輸入的國曆日期：<span id="solarDateDisplay" class="font-medium">-</span></p>
+                            </div>
+                            <button id="convertBtn" class="mt-3 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition">國曆→農曆</button>
 
-        <!-- 計算器部分 -->
-        <div id="calculator" class="content-section active">
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                <h2 class="text-2xl font-bold text-purple-800 mb-6">個人靈數計算</h2>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="text-gray-700 mb-2 block">農曆出生日期</label>
+                            <div class="flex gap-2">
+                                <div class="w-1/3 relative">
+                                    <input type="number" id="lunarYear" placeholder="西元年" class="w-full p-2 border rounded" min="1900" max="2100">
+                                    <div class="text-xs text-gray-500 mt-1">西元年</div>
+                                </div>
+                                <div class="w-1/3 relative">
+                                    <input type="number" id="lunarMonth" placeholder="月" class="w-full p-2 border rounded" min="1" max="12">
+                                    <div class="text-xs text-gray-500 mt-1">月</div>
+                                </div>
+                                <div class="w-1/3 relative">
+                                    <input type="number" id="lunarDay" placeholder="日" class="w-full p-2 border rounded" min="1" max="30">
+                                    <div class="text-xs text-gray-500 mt-1">日</div>
+                                </div>
+                            </div>
+                            <!-- 農曆日期資訊顯示區 -->
+                            <div id="lunarDateInfo" class="date-info mt-3 p-3 bg-white rounded-lg border border-purple-200">
+                                <p class="text-sm text-gray-700">您輸入的農曆日期：<span id="lunarDateDisplay" class="font-medium">-</span></p>
+                            </div>
+                        </div>
+                        
+                        <button id="calculateBtn" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition">計算靈數</button>
+                    </div>
+                    
+                    <!-- 結果區域 -->
+                    <div class="bg-white border border-gray-200 p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold mb-4 text-indigo-700">計算結果</h2>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 mb-2">國曆靈數</h3>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                                    <div class="text-sm text-gray-600">本性</div>
+                                    <div id="solarEssence" class="text-2xl font-bold text-indigo-800 numerology-value" data-type="numerology">-</div>
+                                    <div id="solarEssenceCard" class="text-sm text-indigo-600">-</div>
+            <div class="text-sm text-gray-600 mt-1">貴人/小人</div>
+            <div id="solarEssenceBenefactor" class="text-lg text-indigo-800">-</div>
+            <div id="solarEssenceBenefactorCard" class="text-sm text-indigo-600">-</div>
+                                </div>
+                                <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                                    <div class="text-sm text-gray-600">外在</div>
+                                    <div id="solarExternal" class="text-2xl font-bold text-indigo-800 numerology-value" data-type="numerology">-</div>
+                                    <div id="solarExternalCard" class="text-sm text-indigo-600">-</div>
+            <div class="text-sm text-gray-600 mt-1">貴人/小人</div>
+            <div id="solarExternalBenefactor" class="text-lg text-indigo-800">-</div>
+            <div id="solarExternalBenefactorCard" class="text-sm text-indigo-600">-</div>
+                                </div>
+                                <div class="bg-indigo-100 p-4 rounded-lg text-center">
+                                    <div class="text-sm text-gray-600">內在</div>
+                                    <div id="solarInternal" class="text-2xl font-bold text-indigo-800 numerology-value" data-type="numerology">-</div>
+                                    <div id="solarInternalCard" class="text-sm text-indigo-600">-</div>
+            <div class="text-sm text-gray-600 mt-1">貴人/小人</div>
+            <div id="solarInternalBenefactor" class="text-lg text-indigo-800">-</div>
+            <div id="solarInternalBenefactorCard" class="text-sm text-indigo-600">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">農曆靈數</h3>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-purple-100 p-4 rounded-lg text-center">
+                                    <div class="text-sm text-gray-600">本性</div>
+                                    <div id="lunarEssence" class="text-2xl font-bold text-purple-800 numerology-value" data-type="numerology">-</div>
+                                    <div id="lunarEssenceCard" class="text-sm text-purple-600">-</div>
+            <div class="text-sm text-gray-600 mt-1">貴人/小人</div>
+            <div id="lunarEssenceBenefactor" class="text-lg text-purple-800">-</div>
+            <div id="lunarEssenceBenefactorCard" class="text-sm text-purple-600">-</div>
+                                </div>
+                                <div class="bg-purple-100 p-4 rounded-lg text-center">
+                                    <div class="text-sm text-gray-600">外在</div>
+                                    <div id="lunarExternal" class="text-2xl font-bold text-purple-800 numerology-value" data-type="numerology">-</div>
+                                    <div id="lunarExternalCard" class="text-sm text-purple-600">-</div>
+            <div class="text-sm text-gray-600 mt-1">貴人/小人</div>
+            <div id="lunarExternalBenefactor" class="text-lg text-purple-800">-</div>
+            <div id="lunarExternalBenefactorCard" class="text-sm text-purple-600">-</div>
+                                </div>
+                                <div class="bg-purple-100 p-4 rounded-lg text-center">
+                                    <div class="text-sm text-gray-600">內在</div>
+                                    <div id="lunarInternal" class="text-2xl font-bold text-purple-800 numerology-value" data-type="numerology">-</div>
+                                    <div id="lunarInternalCard" class="text-sm text-purple-600">-</div>
+            <div class="text-sm text-gray-600 mt-1">貴人/小人</div>
+            <div id="lunarInternalBenefactor" class="text-lg text-purple-800">-</div>
+            <div id="lunarInternalBenefactorCard" class="text-sm text-purple-600">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- 國曆輸入 -->
-                    <div class="bg-purple-50 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">國曆生日</h3>
-                        <div class="grid grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">年份</label>
-                                <input type="text" id="solar-year" placeholder="例：90（民國）" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例：1981">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">月份</label>
-                                <select id="solar-month" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                    <option value="" selected disabled>選擇月份</option>
-                                    <option value="1">1月</option>
-                                    <option value="2">2月</option>
-                                    <option value="3">3月</option>
-                                    <option value="4">4月</option>
-                                    <option value="5">5月</option>
-                                    <option value="6">6月</option>
-                                    <option value="7">7月</option>
-                                    <option value="8">8月</option>
-                                    <option value="9">9月</option>
-                                    <option value="10">10月</option>
-                                    <option value="11">11月</option>
-                                    <option value="12">12月</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">日期</label>
-                                <select id="solar-day" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                    <option value="" selected disabled>選擇日期</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <button id="convert-date-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg">
-                                轉換為農曆
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 農曆輸入 -->
-                    <div class="bg-purple-50 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">農曆生日</h3>
-                        <div class="grid grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">年份</label>
-                                <input type="number" id="lunar-year" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例：1981" readonly>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">月份</label>
-                                <select id="lunar-month" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" disabled>
-                                    <option value="" selected disabled>選擇月份</option>
-                                    <option value="1">1月</option>
-                                    <option value="2">2月</option>
-                                    <option value="3">3月</option>
-                                    <option value="4">4月</option>
-                                    <option value="5">5月</option>
-                                    <option value="6">6月</option>
-                                    <option value="7">7月</option>
-                                    <option value="8">8月</option>
-                                    <option value="9">9月</option>
-                                    <option value="10">10月</option>
-                                    <option value="11">11月</option>
-                                    <option value="12">12月</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">日期</label>
-                                <select id="lunar-day" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" disabled>
-                                    <option value="" selected disabled>選擇日期</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mt-4 text-sm text-gray-600" id="lunar-info">
-                            農曆資訊將在轉換後顯示
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 text-center">
-                    <button id="calculate-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-                        計算靈數
-                    </button>
-                </div>
-            </div>
-
-            <!-- 結果顯示區 -->
-            <div id="results" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <!-- 國曆結果 -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="bg-purple-600 text-white p-4">
-                            <h3 class="text-xl font-bold">國曆靈數 (顯性)</h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="grid grid-cols-3 gap-4 mb-6">
-                                <div class="tarot-card bg-purple-100 rounded-lg p-4 text-center">
-                                    <h4 class="text-lg font-semibold text-purple-800 mb-2">本性</h4>
-                                    <div class="text-3xl font-bold text-purple-900 mb-1" id="solar-essence"></div>
-                                    <div class="text-sm text-purple-700" id="solar-essence-card"></div>
-                                </div>
-                                <div class="tarot-card bg-purple-100 rounded-lg p-4 text-center">
-                                    <h4 class="text-lg font-semibold text-purple-800 mb-2">外在</h4>
-                                    <div class="text-3xl font-bold text-purple-900 mb-1" id="solar-external"></div>
-                                    <div class="text-sm text-purple-700" id="solar-external-card"></div>
-                                </div>
-                                <div class="tarot-card bg-purple-100 rounded-lg p-4 text-center">
-                                    <h4 class="text-lg font-semibold text-purple-800 mb-2">內在</h4>
-                                    <div class="text-3xl font-bold text-purple-900 mb-1" id="solar-internal"></div>
-                                    <div class="text-sm text-purple-700" id="solar-internal-card"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 農曆結果 -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="bg-indigo-600 text-white p-4">
-                            <h3 class="text-xl font-bold">農曆靈數 (隱性)</h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="grid grid-cols-3 gap-4 mb-6">
-                                <div class="tarot-card bg-indigo-100 rounded-lg p-4 text-center">
-                                    <h4 class="text-lg font-semibold text-indigo-800 mb-2">本性</h4>
-                                    <div class="text-3xl font-bold text-indigo-900 mb-1" id="lunar-essence"></div>
-                                    <div class="text-sm text-indigo-700" id="lunar-essence-card"></div>
-                                </div>
-                                <div class="tarot-card bg-indigo-100 rounded-lg p-4 text-center">
-                                    <h4 class="text-lg font-semibold text-indigo-800 mb-2">外在</h4>
-                                    <div class="text-3xl font-bold text-indigo-900 mb-1" id="lunar-external"></div>
-                                    <div class="text-sm text-indigo-700" id="lunar-external-card"></div>
-                                </div>
-                                <div class="tarot-card bg-indigo-100 rounded-lg p-4 text-center">
-                                    <h4 class="text-lg font-semibold text-indigo-800 mb-2">內在</h4>
-                                    <div class="text-3xl font-bold text-indigo-900 mb-1" id="lunar-internal"></div>
-                                    <div class="text-sm text-indigo-700" id="lunar-internal-card"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 今年流年 -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4">
-                        <h3 class="text-xl font-bold">今年流年預測</h3>
-                    </div>
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="tarot-card bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-5 text-center">
-                                <h4 class="text-lg font-semibold text-purple-800 mb-2">國曆流年 (外在事件)</h4>
-                                <div class="flex items-center justify-center mb-3">
-                                    <div class="text-4xl font-bold text-purple-900 mr-2" id="current-solar-year-num"></div>
-                                    <div class="text-lg text-purple-700" id="current-solar-year-card"></div>
-                                </div>
-                                <div class="text-sm text-gray-600" id="current-year-solar"></div>
-                                <div class="mt-3 text-sm text-gray-700" id="current-solar-year-theme"></div>
+                <div class="mt-8 bg-gradient-to-r from-indigo-100 to-purple-100 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-700">今年流年</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">國曆流年 (外在事件)</h3>
+                            <div class="flex items-center">
+                                <div id="currentSolarYear" class="text-3xl font-bold text-indigo-800 mr-3 numerology-value" data-type="yearly">-</div>
+                                <div id="currentSolarYearCard" class="text-lg text-indigo-600">-</div>
                             </div>
-                            <div class="tarot-card bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-5 text-center">
-                                <h4 class="text-lg font-semibold text-indigo-800 mb-2">農曆流年 (內心戲)</h4>
-                                <div class="flex items-center justify-center mb-3">
-                                    <div class="text-4xl font-bold text-indigo-900 mr-2" id="current-lunar-year-num"></div>
-                                    <div class="text-lg text-indigo-700" id="current-lunar-year-card"></div>
-                                </div>
-                                <div class="text-sm text-gray-600" id="current-year-lunar"></div>
-                                <div class="mt-3 text-sm text-gray-700" id="current-lunar-year-theme"></div>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">農曆流年 (內心戲)</h3>
+                            <div class="flex items-center">
+                                <div id="currentLunarYear" class="text-3xl font-bold text-purple-800 mr-3 numerology-value" data-type="yearly">-</div>
+                                <div id="currentLunarYearCard" class="text-lg text-purple-600">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 本月流月與本日流日 -->
+                <div class="mt-8 bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-700">本月流月 / 本日流日</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">國曆本月流月</h3>
+                            <div class="flex items-center">
+                                <div id="currentSolarMonth" class="text-3xl font-bold text-indigo-800 mr-3 ">-</div>
+                                <div id="currentSolarMonthCard" class="text-lg text-indigo-600">-</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">農曆本月流月</h3>
+                            <div class="flex items-center">
+                                <div id="currentLunarMonth" class="text-3xl font-bold text-purple-800 mr-3 ">-</div>
+                                <div id="currentLunarMonthCard" class="text-lg text-purple-600">-</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">國曆本日流日</h3>
+                            <div class="flex items-center">
+                                <div id="currentSolarDay" class="text-3xl font-bold text-indigo-800 mr-3 ">-</div>
+                                <div id="currentSolarDayCard" class="text-lg text-indigo-600">-</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">農曆本日流日</h3>
+                            <div class="flex items-center">
+                                <div id="currentLunarDay" class="text-3xl font-bold text-purple-800 mr-3 ">-</div>
+                                <div id="currentLunarDayCard" class="text-lg text-purple-600">-</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 前後五年流年 -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4">
-                        <h3 class="text-xl font-bold">十年流年預測</h3>
-                    </div>
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-2 bg-purple-100 text-purple-800">年份</th>
-                                        <th class="px-4 py-2 bg-purple-100 text-purple-800" colspan="10">國曆流年 (外在事件)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ten-year-solar">
-                                    <!-- 動態填充 -->
-                                </tbody>
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-2 bg-indigo-100 text-indigo-800">年份</th>
-                                        <th class="px-4 py-2 bg-indigo-100 text-indigo-800" colspan="10">農曆流年 (內心戲)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ten-year-lunar">
-                                    <!-- 動態填充 -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 靈數解釋 -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4">
-                        <h3 class="text-xl font-bold">靈數解釋</h3>
-                    </div>
-                    <div class="p-6" id="number-interpretation">
-                        <div class="mb-6">
-                            <h4 class="text-xl font-semibold text-purple-800 mb-3">選擇靈數查看詳細解釋</h4>
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="0">0</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="1">1</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="2">2</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="3">3</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="4">4</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="5">5</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="6">6</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="7">7</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="8">8</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="9">9</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="10">10</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="11">11</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="12">12</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="13">13</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="14">14</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="15">15</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="16">16</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="17">17</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="18">18</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="19">19</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="20">20</button>
-                                <button class="number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="21">21</button>
-                            </div>
-                        </div>
-                        
-                        <div id="number-details" class="hidden">
-                            <div class="flex items-center mb-4">
-                                <div class="text-3xl font-bold text-purple-900 mr-3" id="selected-number"></div>
-                                <div class="text-xl text-purple-700" id="selected-card"></div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <h5 class="text-lg font-semibold text-purple-800 mb-2">正面特質</h5>
-                                    <p class="text-gray-700" id="positive-traits"></p>
-                                </div>
-                                <div>
-                                    <h5 class="text-lg font-semibold text-purple-800 mb-2">負面特質</h5>
-                                    <p class="text-gray-700" id="negative-traits"></p>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <h5 class="text-lg font-semibold text-purple-800 mb-2">性格重點</h5>
-                                <p class="text-gray-700" id="personality-focus"></p>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <h5 class="text-lg font-semibold text-purple-800 mb-2">其他</h5>
-                                <p class="text-gray-700" id="other-info"></p>
-                            </div>
-                            
-                            <div class="mt-4" id="yearly-theme-section">
-                                <h5 class="text-lg font-semibold text-purple-800 mb-2">流年課題</h5>
-                                <p class="text-gray-700" id="yearly-theme"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 一生流年部分 -->
-        <div id="lifetime" class="content-section">
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                <h2 class="text-2xl font-bold text-purple-800 mb-6">一生流年預測</h2>
-                
-                <div class="mb-6 bg-purple-50 p-4 rounded-lg">
-                    <p class="text-gray-700">請先在「靈數計算」頁面輸入您的生日資訊並計算靈數，才能查看一生流年預測。</p>
-                </div>
-                
-                <div id="lifetime-content" class="hidden">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">一生流年預測 (0-99歲)</h3>
-                        <p class="text-gray-600 mb-4">以下是根據您的生日計算出的一生流年數字，每個數字代表該年的主要能量和課題。</p>
-                    </div>
-                    
+                <div class="mt-8 bg-white border border-gray-200 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-indigo-700">前後五年流年</h2>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <tbody id="lifetime-years">
-                                <!-- 動態填充 -->
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="py-2 px-4 border-b text-left">年份</th>
+                                    <th class="py-2 px-4 border-b text-left">國曆流年</th>
+                                    <th class="py-2 px-4 border-b text-left">農曆流年</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tenYearForecast">
+                                <!-- 動態生成 -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- 內容編輯部分 -->
-        <div id="editor" class="content-section">
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                <h2 class="text-2xl font-bold text-purple-800 mb-6">內容編輯</h2>
+            
+            <!-- 生命軌跡頁面 -->
+            <div id="lifepath" class="tab-content">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-700">0-99歲生命軌跡</h2>
+                <div class="bg-white border border-gray-200 p-6 rounded-lg">
+                    <div class="overflow-x-auto">
+                        <table class="w-full" id="lifepathTable">
+                            <!-- 動態生成 -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 內容編輯頁面 -->
+            <div id="editor" class="tab-content">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-700">內容編輯</h2>
                 
                 <div class="mb-6">
-                    <h3 class="text-xl font-semibold text-purple-700 mb-4">選擇編輯項目</h3>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <button class="edit-type-btn px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg" data-type="number">靈數解釋</button>
-                        <button class="edit-type-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-type="yearly">流年課題</button>
+                    <label class="block text-gray-700 mb-2">選擇編輯類型</label>
+                    <select id="editType" class="w-full p-2 border rounded">
+                        <option value="numerology">靈數解釋</option>
+                        <option value="yearlyTheme">流年課題</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">選擇數字</label>
+                    <select id="editNumber" class="w-full p-2 border rounded">
+                        <!-- 動態生成 -->
+                    </select>
+                </div>
+                
+                <div id="numerologyEditor" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">正面特質</label>
+                        <textarea id="positiveTraits" class="w-full p-2 border rounded h-24"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">負面特質</label>
+                        <textarea id="negativeTraits" class="w-full p-2 border rounded h-24"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">其他</label>
+                        <textarea id="others" class="w-full p-2 border rounded h-24"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">性格重點</label>
+                        <textarea id="keyPoints" class="w-full p-2 border rounded h-24"></textarea>
                     </div>
                 </div>
                 
-                <!-- 匯入/匯出功能 -->
-                <div class="mb-8 p-4 bg-purple-50 rounded-lg">
-                    <h3 class="text-lg font-semibold text-purple-800 mb-3">資料匯入/匯出</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <h4 class="font-medium text-purple-700 mb-2">匯出資料</h4>
-                            <button id="export-data-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg">
-                                匯出 JSON 檔案
-                            </button>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-medium text-purple-700 mb-2">匯入資料</h4>
-                            <input type="file" id="import-file" accept=".json" class="hidden">
-                            <label for="import-file" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer inline-block">
-                                選擇 JSON 檔案
-                            </label>
-                            <span id="file-name" class="ml-2 text-sm text-gray-600"></span>
-                        </div>
+                <div id="yearlyThemeEditor" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-gray-700 mb-2">流年課題</label>
+                        <textarea id="yearlyTheme" class="w-full p-2 border rounded h-36"></textarea>
                     </div>
                 </div>
                 
-                <div id="number-editor" class="edit-section">
-                    <div class="mb-6">
-                        <h4 class="text-lg font-semibold text-purple-800 mb-3">選擇靈數</h4>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="0">0</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="1">1</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="2">2</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="3">3</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="4">4</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="5">5</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="6">6</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="7">7</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="8">8</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="9">9</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="10">10</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="11">11</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="12">12</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="13">13</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="14">14</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="15">15</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="16">16</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="17">17</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="18">18</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="19">19</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="20">20</button>
-                            <button class="edit-number-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="21">21</button>
-                        </div>
-                    </div>
-                    
-                    <div id="number-edit-form" class="hidden">
-                        <div class="flex items-center mb-4">
-                            <div class="text-3xl font-bold text-purple-900 mr-3" id="edit-selected-number"></div>
-                            <div class="text-xl text-purple-700" id="edit-selected-card"></div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">正面特質</label>
-                            <textarea id="edit-positive-traits" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">負面特質</label>
-                            <textarea id="edit-negative-traits" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">性格重點</label>
-                            <textarea id="edit-personality-focus" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">其他</label>
-                            <textarea id="edit-other-info" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="text-center mt-6">
-                            <button id="save-number-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out">
-                                儲存變更
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="yearly-editor" class="edit-section hidden">
-                    <div class="mb-6">
-                        <h4 class="text-lg font-semibold text-purple-800 mb-3">選擇流年數字</h4>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="0">0</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="1">1</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="2">2</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="3">3</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="4">4</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="5">5</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="6">6</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="7">7</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="8">8</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="9">9</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="10">10</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="11">11</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="12">12</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="13">13</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="14">14</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="15">15</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="16">16</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="17">17</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="18">18</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="19">19</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="20">20</button>
-                            <button class="edit-yearly-btn px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg" data-number="21">21</button>
-                        </div>
-                    </div>
-                    
-                    <div id="yearly-edit-form" class="hidden">
-                        <div class="flex items-center mb-4">
-                            <div class="text-3xl font-bold text-purple-900 mr-3" id="edit-yearly-number"></div>
-                            <div class="text-xl text-purple-700" id="edit-yearly-card"></div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">流年課題</label>
-                            <textarea id="edit-yearly-theme" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" rows="5"></textarea>
-                        </div>
-                        
-                        <div class="text-center mt-6">
-                            <button id="save-yearly-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out">
-                                儲存變更
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <button id="saveContentBtn" class="mt-4 bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition">儲存內容</button>
+                <button id="exportContentBtn" class="mt-4 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition ml-2">匯出內容</button>
+                <button id="importContentBtn" class="mt-4 bg-yellow-600 text-white py-3 px-4 rounded-lg hover:bg-yellow-700 transition ml-2">匯入內容</button>
+                <input type="file" id="importFileInput" accept=".json" class="hidden" />
+
             </div>
         </div>
     </div>
 
-    <footer class="bg-purple-900 text-white py-6 mt-10">
-        <div class="container mx-auto px-4 text-center">
-            <p>© 2023 塔羅靈數計算器 | 探索你的命運數字與塔羅牌指引</p>
+    <!-- 靈數解釋彈窗 -->
+    <div id="numerologyModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle" class="text-xl font-semibold mb-4 text-indigo-700"></h2>
+            <div id="modalContent" class="space-y-4"></div>
         </div>
-    </footer>
+    </div>
 
-    <script>
-        // 塔羅牌名稱
-        const tarotCards = [
-            "愚人", "魔法師", "女祭司", "女皇", "國王", "教宗", 
-            "戀人", "戰車", "力量", "隱士", "命運之輪", "正義", 
-            "吊人", "死神", "節制", "惡魔", "高塔", "星星", 
-            "月亮", "太陽", "審判", "世界"
-        ];
-
-        // 初始化靈數解釋數據
-        let numberInterpretations = {
-            0: {
-                positiveTraits: "創新、無限可能、新的開始、純真、自由",
-                negativeTraits: "魯莽、不負責任、缺乏方向、過度天真",
-                personalityFocus: "開放心態、接受新事物、勇於冒險",
-                otherInfo: "代表一個循環的結束和新的開始，象徵無限可能性"
-            },
-            1: {
-                positiveTraits: "領導力、獨立、創造力、自信、主動",
-                negativeTraits: "專制、自我中心、固執、傲慢",
-                personalityFocus: "獨立思考、開創新局、自我實現",
-                otherInfo: "代表新的開始、獨立和自主性，是創造和領導的數字"
-            },
-            2: {
-                positiveTraits: "合作、和諧、直覺、敏感、外交",
-                negativeTraits: "優柔寡斷、過度依賴、情緒化、猶豫不決",
-                personalityFocus: "平衡與和諧、合作精神、關係建立",
-                otherInfo: "代表二元性、平衡和合作，強調關係和直覺"
-            },
-            3: {
-                positiveTraits: "創意、表達、樂觀、社交、幽默",
-                negativeTraits: "膚淺、散漫、過度樂觀、注意力不集中",
-                personalityFocus: "創意表達、社交互動、樂觀態度",
-                otherInfo: "代表創造力、表達和擴展，是藝術和交流的數字"
-            },
-            4: {
-                positiveTraits: "穩定、可靠、組織、實際、勤奮",
-                negativeTraits: "固執、保守、缺乏彈性、工作狂",
-                personalityFocus: "建立穩固基礎、系統化工作、實際解決問題",
-                otherInfo: "代表穩定性、秩序和結構，是建設和實現的數字"
-            },
-            5: {
-                positiveTraits: "適應性、自由、變化、冒險、多才多藝",
-                negativeTraits: "不穩定、衝動、過度冒險、難以承諾",
-                personalityFocus: "擁抱變化、探索新可能、追求自由",
-                otherInfo: "代表變化、自由和冒險，是運動和進步的數字"
-            },
-            6: {
-                positiveTraits: "和諧、責任、愛、關懷、平衡",
-                negativeTraits: "過度犧牲、干涉、完美主義、過度負責",
-                personalityFocus: "關愛他人、創造和諧、承擔責任",
-                otherInfo: "代表愛、責任和平衡，是家庭和服務的數字"
-            },
-            7: {
-                positiveTraits: "智慧、分析、內省、精神追求、獨立思考",
-                negativeTraits: "懷疑、過度分析、孤僻、冷漠",
-                personalityFocus: "深度思考、精神探索、尋求真理",
-                otherInfo: "代表智慧、分析和精神追求，是神秘和內省的數字"
-            },
-            8: {
-                positiveTraits: "力量、成就、權威、物質成功、組織能力",
-                negativeTraits: "控制欲、工作狂、物質主義、權力濫用",
-                personalityFocus: "實現目標、建立權威、追求成功",
-                otherInfo: "代表力量、權威和物質成就，是平衡和循環的數字"
-            },
-            9: {
-                positiveTraits: "人道主義、同情心、理想主義、智慧、寬容",
-                negativeTraits: "不切實際、過度理想化、自我犧牲、情緒化",
-                personalityFocus: "服務他人、追求理想、精神成長",
-                otherInfo: "代表完成、人道主義和普世愛，是結束和轉變的數字"
-            },
-            10: {
-                positiveTraits: "完成、新的開始、潛力、機會、循環",
-                negativeTraits: "不穩定、無法預測、缺乏控制感",
-                personalityFocus: "接受變化、把握機會、適應新環境",
-                otherInfo: "代表一個循環的結束和新的開始，象徵命運的轉輪"
-            },
-            11: {
-                positiveTraits: "直覺、靈感、精神覺醒、理想主義、創新",
-                negativeTraits: "過度敏感、不切實際、神經質、極端",
-                personalityFocus: "高度直覺、精神追求、創新思維",
-                otherInfo: "代表高度直覺和精神啟示，是大師級的數字"
-            },
-            12: {
-                positiveTraits: "犧牲、智慧、靈性、轉變、新視角",
-                negativeTraits: "自我犧牲、猶豫不決、受害者心態",
-                personalityFocus: "接受限制、尋找新視角、精神成長",
-                otherInfo: "代表犧牲和轉變，象徵通過放下獲得新的理解"
-            },
-            13: {
-                positiveTraits: "轉變、重生、結束與開始、深刻變化",
-                negativeTraits: "抗拒變化、恐懼失去、執著過去",
-                personalityFocus: "接受變化、放下過去、迎接新生",
-                otherInfo: "代表結束和新生，象徵深刻的轉變和重生"
-            },
-            14: {
-                positiveTraits: "平衡、調和、適度、耐心、自我控制",
-                negativeTraits: "極端、缺乏節制、不平衡、過度壓抑",
-                personalityFocus: "尋找平衡、調和對立、適度行事",
-                otherInfo: "代表平衡和調和，象徵在對立中找到中庸之道"
-            },
-            15: {
-                positiveTraits: "激情、力量、創造力、本能、解放",
-                negativeTraits: "沉迷、執著、控制、操縱、恐懼",
-                personalityFocus: "面對陰影、釋放束縛、認識本能",
-                otherInfo: "代表面對內在陰影和束縛，象徵通過認識限制獲得自由"
-            },
-            16: {
-                positiveTraits: "突破、覺醒、解放、真相、啟示",
-                negativeTraits: "混亂、破壞、抗拒變化、恐懼崩塌",
-                personalityFocus: "接受突變、從廢墟中重建、尋求真相",
-                otherInfo: "代表突然的變化和啟示，象徵舊結構的崩塌和新視野的開啟"
-            },
-            17: {
-                positiveTraits: "希望、靈感、指引、創造力、信念",
-                negativeTraits: "不切實際、過度樂觀、缺乏行動",
-                personalityFocus: "保持希望、尋找指引、相信未來",
-                otherInfo: "代表希望和靈感，象徵在黑暗中的指引之光"
-            },
-            18: {
-                positiveTraits: "直覺、潛意識、夢境、神秘、創造力",
-                negativeTraits: "幻覺、恐懼、混亂、欺騙、不安",
-                personalityFocus: "面對恐懼、信任直覺、探索潛意識",
-                otherInfo: "代表面對潛意識和幻覺，象徵通過迷霧尋找真相"
-            },
-            19: {
-                positiveTraits: "活力、成功、樂觀、清晰、自信",
-                negativeTraits: "自我中心、過度自信、盲目樂觀",
-                personalityFocus: "展現真我、分享喜悅、積極向上",
-                otherInfo: "代表成功和喜悅，象徵實現目標後的滿足和幸福"
-            },
-            20: {
-                positiveTraits: "覺醒、重生、反思、寬恕、解脫",
-                negativeTraits: "自我批判、猶豫不決、恐懼改變",
-                personalityFocus: "接受過去、寬恕自己和他人、迎接新生",
-                otherInfo: "代表覺醒和重生，象徵通過反思和寬恕獲得新生"
-            },
-            21: {
-                positiveTraits: "完成、整合、成就、圓滿、和諧",
-                negativeTraits: "恐懼結束、抗拒新開始、完美主義",
-                personalityFocus: "慶祝成就、接受圓滿、準備新旅程",
-                otherInfo: "代表完成和圓滿，象徵一個旅程的結束和新旅程的開始"
-            }
-        };
-
-        // 初始化流年課題數據
-        let yearlyThemes = {
-            0: "新的開始，放下過去，接受未知的旅程。這一年你將面臨許多新的可能性，需要保持開放的心態。",
-            1: "獨立自主，展現領導力。這一年你需要依靠自己的力量，開創新局面，勇敢表達自己的想法。",
-            2: "合作與關係，尋求平衡。這一年你將專注於人際關係，學習如何與他人和諧相處，發展重要的夥伴關係。",
-            3: "創意表達，社交擴展。這一年你將有機會展現你的創造力，擴大你的社交圈，享受生活的樂趣。",
-            4: "建立基礎，穩定發展。這一年你需要腳踏實地，建立穩固的基礎，為未來的發展做好準備。",
-            5: "變化與自由，冒險嘗試。這一年你將經歷許多變化，需要保持靈活的態度，勇於嘗試新事物。",
-            6: "責任與關懷，家庭和諧。這一年你將專注於家庭和責任，學習如何平衡個人需求和他人需要。",
-            7: "內省與智慧，精神成長。這一年你將有機會深入思考人生的意義，發展你的精神層面，尋求內在的智慧。",
-            8: "力量與成就，物質豐盛。這一年你將專注於事業和財務目標，有機會獲得物質上的成功和認可。",
-            9: "完成與放下，人道關懷。這一年你將結束某些生命階段，學習放下，同時發展對他人的同情心和關懷。",
-            10: "命運的轉折，機會與挑戰。這一年你將面臨命運的轉變，需要適應新的環境，把握機會，克服挑戰。",
-            11: "靈性覺醒，高度直覺。這一年你的直覺能力將增強，可能經歷精神上的覺醒，接收到重要的啟示。",
-            12: "犧牲與智慧，新視角。這一年你可能需要放棄某些東西，但通過這種犧牲，你將獲得新的視角和智慧。",
-            13: "轉變與重生，結束與開始。這一年你將經歷深刻的轉變，某些事物將結束，但新的機會也將出現。",
-            14: "平衡與調和，自我控制。這一年你需要在各個方面尋求平衡，學習如何控制自己的衝動和欲望。",
-            15: "面對陰影，釋放束縛。這一年你將面對內在的恐懼和限制，有機會釋放長期的束縛，獲得真正的自由。",
-            16: "突破與覺醒，結構重建。這一年你可能經歷突然的變化和挑戰，但這些都是為了打破舊有的結構，建立新的基礎。",
-            17: "希望與指引，創意靈感。這一年你將充滿希望和靈感，有機會追隨你的夢想，發現新的可能性。",
-            18: "面對幻覺，信任直覺。這一年你可能面臨混亂和不確定性，需要學習信任你的直覺，穿越迷霧尋找真相。",
-            19: "成功與喜悅，自信展現。這一年你將收穫成功的果實，充滿活力和樂觀，有機會展現真正的自我。",
-            20: "覺醒與重生，寬恕與釋放。這一年你將有機會反思過去，寬恕自己和他人，迎接新的開始。",
-            21: "完成與圓滿，整合與和諧。這一年你將完成重要的人生階段，感受到圓滿和成就，為新的旅程做好準備。"
-        };
-
-        // 存儲計算結果的全局變數
-        let calculationResults = {
-            solarYear: null,
-            solarMonth: null,
-            solarDay: null,
-            lunarYear: null,
-            lunarMonth: null,
-            lunarDay: null,
-            solarEssence: null,
-            solarExternal: null,
-            solarInternal: null,
-            lunarEssence: null,
-            lunarExternal: null,
-            lunarInternal: null
-        };
-
-        // 日期選擇器填充
-        function populateDays(monthSelect, daySelect) {
-            if (!monthSelect.value) {
-                daySelect.innerHTML = '<option value="" selected disabled>選擇日期</option>';
-                return;
-            }
-            
-            const month = parseInt(monthSelect.value);
-            const daysInMonth = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-            
-            daySelect.innerHTML = '<option value="" selected disabled>選擇日期</option>';
-            for (let i = 1; i <= daysInMonth[month]; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i + '日';
-                daySelect.appendChild(option);
-            }
-        }
-
-        // 初始化所有日期選擇器
-        function initializeDateSelectors() {
-            const selectors = [
-                { month: 'solar-month', day: 'solar-day' },
-                { month: 'lunar-month', day: 'lunar-day' }
-            ];
-            
-            selectors.forEach(selector => {
-                const monthSelect = document.getElementById(selector.month);
-                const daySelect = document.getElementById(selector.day);
-                
-                populateDays(monthSelect, daySelect);
-                
-                monthSelect.addEventListener('change', () => {
-                    populateDays(monthSelect, daySelect);
-                });
-            });
-        }
-
-        // 國曆轉農曆
-        function convertSolarToLunar() {
-            
-    let solarInput = document.getElementById('solar-year').value.trim();
-    let solarYear = parseInt(solarInput);
-    if (!isNaN(solarYear) && solarYear < 1911) {
-        solarYear += 1911;
-    }
     
-            const solarMonth = parseInt(document.getElementById('solar-month').value);
-            const solarDay = parseInt(document.getElementById('solar-day').value);
-            
-            if (isNaN(solarYear) || isNaN(solarMonth) || isNaN(solarDay)) {
-                alert('請填寫完整的國曆日期');
-                return;
-            }
-            
-            try {
-                // 使用lunar-javascript庫進行轉換
-                const solar = Solar.fromYmd(solarYear, solarMonth, solarDay);
-                const lunar = solar.getLunar();
-                
-                // 填充農曆日期
-                document.getElementById('lunar-year').value = lunar.getYear();
-                
-                const lunarMonthSelect = document.getElementById('lunar-month');
-                lunarMonthSelect.value = lunar.getMonth();
-                lunarMonthSelect.disabled = false;
-                
-                populateDays(lunarMonthSelect, document.getElementById('lunar-day'));
-                
-                const lunarDaySelect = document.getElementById('lunar-day');
-                lunarDaySelect.value = lunar.getDay();
-                lunarDaySelect.disabled = false;
-                
-                // 顯示農曆資訊
-                
-const zhAnimals = {
-    "Rat": "鼠", "Ox": "牛", "Tiger": "虎", "Rabbit": "兔", "Dragon": "龍", "Snake": "蛇",
-    "Horse": "馬", "Goat": "羊", "Monkey": "猴", "Rooster": "雞", "Dog": "狗", "Pig": "豬"
-};
-const shengxiao = zhAnimals[lunar.getYearShengXiao()] || lunar.getYearShengXiao();
-let lunarInfo = `農曆生日：${lunar.getYearInChinese()}年 ${lunar.getMonthInChinese()}月 ${lunar.getDayInChinese()}日`;
-lunarInfo += `<br>生肖：${shengxiao}`;
-document.getElementById('lunar-info').innerHTML = lunarInfo;
 
-                
-                document.getElementById('lunar-info').innerHTML = lunarInfo;
-            } catch (error) {
-                console.error('轉換農曆出錯:', error);
-                alert('轉換農曆時出錯，請檢查日期是否有效');
-            }
-        }
 
-        // 計算靈數
-        function calculateEssenceNumber(year) {
-            // 取年份後兩位數相加
-            const lastTwoDigits = year % 100;
-            const tens = Math.floor(lastTwoDigits / 10);
-            const ones = lastTwoDigits % 10;
-            let sum = tens + ones;
-            
-            // 如果大於21，減去22
-            if (sum > 21) {
-                sum -= 22;
-            }
-            
-            return sum;
-        }
 
-        function calculateExternalNumber(year, month, day) {
-            // 年份+月份+日期
-            let sum = year + month + day;
-            
-            // 將結果拆開相加
-            let result = 0;
-            while (sum > 0) {
-                result += sum % 10;
-                sum = Math.floor(sum / 10);
-            }
-            
-            // 如果結果大於21，再次拆開相加
-            if (result > 21) {
-                let newResult = 0;
-                while (result > 0) {
-                    newResult += result % 10;
-                    result = Math.floor(result / 10);
-                }
-                result = newResult;
-                
-                // 如果還是大於21，減去22
-                if (result > 21) {
-                    result -= 22;
-                }
-            }
-            
-            return result;
-        }
-
-        function calculateInternalNumber(externalNumber) {
-            // 如果外在數字不超過21，內在數字等於外在數字
-            if (externalNumber <= 21) {
-                return externalNumber;
-            }
-            
-            // 否則，將外在數字拆開相加
-            let result = 0;
-            let temp = externalNumber;
-            while (temp > 0) {
-                result += temp % 10;
-                temp = Math.floor(temp / 10);
-            }
-            
-            return result;
-        }
-
-        // 計算流年數字
-        function calculateYearlyNumber(birthYear, birthMonth, birthDay, currentYear) {
-            // 檢查生日是否已過
-            const today = new Date();
-            const currentMonth = today.getMonth() + 1;
-            const currentDay = today.getDate();
-            
-            // 如果今年的生日還沒到，使用前一年
-            const yearToUse = (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) 
-                ? currentYear - 1 
-                : currentYear;
-            
-            // 計算流年數字：年份+月份+日期
-            let sum = yearToUse + birthMonth + birthDay;
-            
-            // 將結果拆開相加
-            let result = 0;
-            while (sum > 0) {
-                result += sum % 10;
-                sum = Math.floor(sum / 10);
-            }
-            
-            // 如果結果大於21，再次拆開相加
-            if (result > 21) {
-                let newResult = 0;
-                while (result > 0) {
-                    newResult += result % 10;
-                    result = Math.floor(result / 10);
-                }
-                result = newResult;
-                
-                // 如果還是大於21，繼續拆開相加
-                if (result > 21) {
-                    newResult = 0;
-                    while (result > 0) {
-                        newResult += result % 10;
-                        result = Math.floor(result / 10);
-                    }
-                    result = newResult;
-                }
-            }
-            
-            return result;
-        }
-
-        // 獲取塔羅牌名稱
-        function getTarotCardName(number) {
-            return tarotCards[number];
-        }
-
-        // 計算靈數並顯示結果
-        function calculateAndDisplayResults() {
-            // 獲取輸入值
-            
-    let solarInput = document.getElementById('solar-year').value.trim();
-    let solarYear = parseInt(solarInput);
-    if (!isNaN(solarYear) && solarYear < 1911) {
-        solarYear += 1911;
-    }
-    
-            const solarMonth = parseInt(document.getElementById('solar-month').value);
-            const solarDay = parseInt(document.getElementById('solar-day').value);
-            
-            const lunarYear = parseInt(document.getElementById('lunar-year').value);
-            const lunarMonth = parseInt(document.getElementById('lunar-month').value);
-            const lunarDay = parseInt(document.getElementById('lunar-day').value);
-            
-            // 檢查輸入是否有效
-            if (isNaN(solarYear) || isNaN(solarMonth) || isNaN(solarDay) ||
-                isNaN(lunarYear) || isNaN(lunarMonth) || isNaN(lunarDay)) {
-                alert('請填寫完整的出生日期資料');
-                return;
-            }
-            
-            // 計算國曆靈數
-            const solarEssence = calculateEssenceNumber(solarYear);
-            const solarExternal = calculateExternalNumber(solarYear, solarMonth, solarDay);
-            const solarInternal = calculateInternalNumber(solarExternal);
-            
-            // 計算農曆靈數
-            const lunarEssence = calculateEssenceNumber(lunarYear);
-            const lunarExternal = calculateExternalNumber(lunarYear, lunarMonth, lunarDay);
-            const lunarInternal = calculateInternalNumber(lunarExternal);
-            
-            // 儲存計算結果
-            calculationResults = {
-                solarYear, solarMonth, solarDay,
-                lunarYear, lunarMonth, lunarDay,
-                solarEssence, solarExternal, solarInternal,
-                lunarEssence, lunarExternal, lunarInternal
-            };
-            
-            // 顯示結果
-            document.getElementById('solar-essence').textContent = solarEssence;
-            document.getElementById('solar-external').textContent = solarExternal;
-            document.getElementById('solar-internal').textContent = solarInternal;
-            
-            document.getElementById('lunar-essence').textContent = lunarEssence;
-            document.getElementById('lunar-external').textContent = lunarExternal;
-            document.getElementById('lunar-internal').textContent = lunarInternal;
-            
-            // 顯示對應的塔羅牌
-            document.getElementById('solar-essence-card').textContent = getTarotCardName(solarEssence);
-            document.getElementById('solar-external-card').textContent = getTarotCardName(solarExternal);
-            document.getElementById('solar-internal-card').textContent = getTarotCardName(solarInternal);
-            
-            document.getElementById('lunar-essence-card').textContent = getTarotCardName(lunarEssence);
-            document.getElementById('lunar-external-card').textContent = getTarotCardName(lunarExternal);
-            document.getElementById('lunar-internal-card').textContent = getTarotCardName(lunarInternal);
-            
-            // 計算今年流年
-            const currentYear = new Date().getFullYear();
-            const solarYearlyNumber = calculateYearlyNumber(solarYear, solarMonth, solarDay, currentYear);
-            const lunarYearlyNumber = calculateYearlyNumber(lunarYear, lunarMonth, lunarDay, currentYear);
-            
-            document.getElementById('current-solar-year-num').textContent = solarYearlyNumber;
-            document.getElementById('current-lunar-year-num').textContent = lunarYearlyNumber;
-            
-            document.getElementById('current-solar-year-card').textContent = getTarotCardName(solarYearlyNumber);
-            document.getElementById('current-lunar-year-card').textContent = getTarotCardName(lunarYearlyNumber);
-            
-            document.getElementById('current-year-solar').textContent = currentYear + ' 年';
-            document.getElementById('current-year-lunar').textContent = currentYear + ' 年';
-            
-            // 顯示流年課題
-            document.getElementById('current-solar-year-theme').textContent = yearlyThemes[solarYearlyNumber];
-            document.getElementById('current-lunar-year-theme').textContent = yearlyThemes[lunarYearlyNumber];
-            
-            // 計算前後五年流年
-            const startYear = currentYear - 5;
-            generateTenYearForecast(solarYear, solarMonth, solarDay, lunarYear, lunarMonth, lunarDay, startYear);
-            
-            // 計算一生流年
-            generateLifetimeYears(solarYear, solarMonth, solarDay, lunarYear, lunarMonth, lunarDay);
-            
-            // 顯示結果區域
-            document.getElementById('results').classList.remove('hidden');
-            document.getElementById('lifetime-content').classList.remove('hidden');
-        }
-
-        // 生成十年流年預測表格
-        function generateTenYearForecast(solarYear, solarMonth, solarDay, lunarYear, lunarMonth, lunarDay, startYear) {
-            const solarTableBody = document.getElementById('ten-year-solar');
-            const lunarTableBody = document.getElementById('ten-year-lunar');
-            
-            solarTableBody.innerHTML = '';
-            lunarTableBody.innerHTML = '';
-            
-            // 創建國曆流年行
-            const solarRow = document.createElement('tr');
-            let solarYearCell = document.createElement('td');
-            solarYearCell.className = 'px-4 py-3 text-center font-medium';
-            solarYearCell.textContent = '年份';
-            solarRow.appendChild(solarYearCell);
-            
-            // 創建農曆流年行
-            const lunarRow = document.createElement('tr');
-            let lunarYearCell = document.createElement('td');
-            lunarYearCell.className = 'px-4 py-3 text-center font-medium';
-            lunarYearCell.textContent = '年份';
-            lunarRow.appendChild(lunarYearCell);
-            
-            // 填充十年數據
-            for (let i = 0; i < 10; i++) {
-                const year = startYear + i;
-                const solarYearlyNumber = calculateYearlyNumber(solarYear, solarMonth, solarDay, year);
-                const lunarYearlyNumber = calculateYearlyNumber(lunarYear, lunarMonth, lunarDay, year);
-                
-                // 國曆流年單元格
-                let solarCell = document.createElement('td');
-                solarCell.className = 'px-4 py-3 text-center year-cell';
-                if (year === new Date().getFullYear()) {
-                    solarCell.classList.add('bg-purple-200', 'font-bold');
-                }
-                
-                let solarContent = document.createElement('div');
-                solarContent.innerHTML = `
-                    <div class="text-lg">${year}</div>
-                    <div class="text-2xl font-bold text-purple-800">${solarYearlyNumber}</div>
-                    <div class="text-sm text-purple-600">${getTarotCardName(solarYearlyNumber)}</div>
-                `;
-                solarCell.appendChild(solarContent);
-                solarRow.appendChild(solarCell);
-                
-                // 農曆流年單元格
-                let lunarCell = document.createElement('td');
-                lunarCell.className = 'px-4 py-3 text-center year-cell';
-                if (year === new Date().getFullYear()) {
-                    lunarCell.classList.add('bg-indigo-200', 'font-bold');
-                }
-                
-                let lunarContent = document.createElement('div');
-                lunarContent.innerHTML = `
-                    <div class="text-lg">${year}</div>
-                    <div class="text-2xl font-bold text-indigo-800">${lunarYearlyNumber}</div>
-                    <div class="text-sm text-indigo-600">${getTarotCardName(lunarYearlyNumber)}</div>
-                `;
-                lunarCell.appendChild(lunarContent);
-                lunarRow.appendChild(lunarCell);
-            }
-            
-            solarTableBody.appendChild(solarRow);
-            lunarTableBody.appendChild(lunarRow);
-        }
-
-        // 生成一生流年表格
-        function generateLifetimeYears(solarYear, solarMonth, solarDay, lunarYear, lunarMonth, lunarDay) {
-            const tableBody = document.getElementById('lifetime-years');
-            tableBody.innerHTML = '';
-            
-            // 每10年一行
-            for (let decade = 0; decade < 10; decade++) {
-                const row = document.createElement('tr');
-                
-                // 每行10個年齡
-                for (let i = 0; i < 10; i++) {
-                    const age = decade * 10 + i;
-                    const year = solarYear + age;
-                    
-                    const solarYearlyNumber = calculateYearlyNumber(solarYear, solarMonth, solarDay, year);
-                    const lunarYearlyNumber = calculateYearlyNumber(lunarYear, lunarMonth, lunarDay, year);
-                    
-                    const cell = document.createElement('td');
-                    cell.className = 'p-3 border';
-                    
-                    if (year === new Date().getFullYear()) {
-                        cell.classList.add('bg-purple-100');
-                    }
-                    
-                    cell.innerHTML = `
-                        <div class="text-center">
-                            <div class="font-bold text-purple-800">${age}歲 (${year}年)</div>
-                            <div class="grid grid-cols-2 gap-2 mt-2">
-                                <div class="bg-purple-50 p-2 rounded">
-                                    <div class="text-sm text-purple-600">國曆</div>
-                                    <div class="text-xl font-bold">${solarYearlyNumber}</div>
-                                    <div class="text-xs">${getTarotCardName(solarYearlyNumber)}</div>
-                                </div>
-                                <div class="bg-indigo-50 p-2 rounded">
-                                    <div class="text-sm text-indigo-600">農曆</div>
-                                    <div class="text-xl font-bold">${lunarYearlyNumber}</div>
-                                    <div class="text-xs">${getTarotCardName(lunarYearlyNumber)}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    row.appendChild(cell);
-                }
-                
-                tableBody.appendChild(row);
-            }
-        }
-
-        // 顯示靈數解釋
-        function showNumberInterpretation(number) {
-            const interpretation = numberInterpretations[number];
-            
-            document.getElementById('selected-number').textContent = number;
-            document.getElementById('selected-card').textContent = getTarotCardName(number);
-            
-            document.getElementById('positive-traits').textContent = interpretation.positiveTraits;
-            document.getElementById('negative-traits').textContent = interpretation.negativeTraits;
-            document.getElementById('personality-focus').textContent = interpretation.personalityFocus;
-            document.getElementById('other-info').textContent = interpretation.otherInfo;
-            
-            // 顯示流年課題部分
-            document.getElementById('yearly-theme-section').classList.remove('hidden');
-            document.getElementById('yearly-theme').textContent = yearlyThemes[number];
-            
-            document.getElementById('number-details').classList.remove('hidden');
-        }
-
-        // 顯示編輯靈數表單
-        function showNumberEditForm(number) {
-            const interpretation = numberInterpretations[number];
-            
-            document.getElementById('edit-selected-number').textContent = number;
-            document.getElementById('edit-selected-card').textContent = getTarotCardName(number);
-            
-            document.getElementById('edit-positive-traits').value = interpretation.positiveTraits;
-            document.getElementById('edit-negative-traits').value = interpretation.negativeTraits;
-            document.getElementById('edit-personality-focus').value = interpretation.personalityFocus;
-            document.getElementById('edit-other-info').value = interpretation.otherInfo;
-            
-            document.getElementById('number-edit-form').classList.remove('hidden');
-        }
-
-        // 顯示編輯流年表單
-        function showYearlyEditForm(number) {
-            document.getElementById('edit-yearly-number').textContent = number;
-            document.getElementById('edit-yearly-card').textContent = getTarotCardName(number);
-            document.getElementById('edit-yearly-theme').value = yearlyThemes[number];
-            
-            document.getElementById('yearly-edit-form').classList.remove('hidden');
-        }
-
-        // 保存靈數編輯
-        function saveNumberEdit() {
-            const number = parseInt(document.getElementById('edit-selected-number').textContent);
-            
-            numberInterpretations[number] = {
-                positiveTraits: document.getElementById('edit-positive-traits').value,
-                negativeTraits: document.getElementById('edit-negative-traits').value,
-                personalityFocus: document.getElementById('edit-personality-focus').value,
-                otherInfo: document.getElementById('edit-other-info').value
-            };
-            
-            // 保存到本地存儲
-            localStorage.setItem('numberInterpretations', JSON.stringify(numberInterpretations));
-            
-            alert('靈數解釋已保存！');
-        }
-
-        // 保存流年編輯
-        function saveYearlyEdit() {
-            const number = parseInt(document.getElementById('edit-yearly-number').textContent);
-            
-            yearlyThemes[number] = document.getElementById('edit-yearly-theme').value;
-            
-            // 保存到本地存儲
-            localStorage.setItem('yearlyThemes', JSON.stringify(yearlyThemes));
-            
-            alert('流年課題已保存！');
-        }
-
-        // 切換標籤頁
-        function switchTab(tabId) {
-            // 隱藏所有內容
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // 顯示選中的內容
-            document.getElementById(tabId).classList.add('active');
-            
-            // 更新標籤樣式
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('tab-active');
-            });
-            
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('tab-active');
-        }
-
-        // 切換編輯類型
-        function switchEditType(type) {
-            document.querySelectorAll('.edit-section').forEach(section => {
-                section.classList.add('hidden');
-            });
-            
-            if (type === 'number') {
-                document.getElementById('number-editor').classList.remove('hidden');
-            } else if (type === 'yearly') {
-                document.getElementById('yearly-editor').classList.remove('hidden');
-            }
-            
-            document.querySelectorAll('.edit-type-btn').forEach(btn => {
-                btn.classList.remove('bg-purple-600', 'text-white', 'hover:bg-purple-700');
-                btn.classList.add('bg-purple-100', 'hover:bg-purple-200');
-            });
-            
-            document.querySelector(`[data-type="${type}"]`).classList.remove('bg-purple-100', 'hover:bg-purple-200');
-            document.querySelector(`[data-type="${type}"]`).classList.add('bg-purple-600', 'text-white', 'hover:bg-purple-700');
-        }
-
-        // 從本地存儲加載數據
-        function loadStoredData() {
-            const storedNumberInterpretations = localStorage.getItem('numberInterpretations');
-            if (storedNumberInterpretations) {
-                numberInterpretations = JSON.parse(storedNumberInterpretations);
-            }
-            
-            const storedYearlyThemes = localStorage.getItem('yearlyThemes');
-            if (storedYearlyThemes) {
-                yearlyThemes = JSON.parse(storedYearlyThemes);
-            }
-        }
-
-        // 匯出數據為JSON檔案
-        function exportData() {
-            const data = {
-                numberInterpretations: numberInterpretations,
-                yearlyThemes: yearlyThemes
-            };
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const downloadLink = document.createElement('a');
-            downloadLink.href = url;
-            downloadLink.download = 'tarot_numerology_data.json';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }
-
-        // 匯入JSON檔案
-        function importData(file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.numberInterpretations) {
-                        numberInterpretations = data.numberInterpretations;
-                        localStorage.setItem('numberInterpretations', JSON.stringify(numberInterpretations));
-                    }
-                    
-                    if (data.yearlyThemes) {
-                        yearlyThemes = data.yearlyThemes;
-                        localStorage.setItem('yearlyThemes', JSON.stringify(yearlyThemes));
-                    }
-                    
-                    alert('資料匯入成功！');
-                } catch (error) {
-                    alert('匯入失敗：無效的JSON檔案');
-                    console.error(error);
-                }
-            };
-            
-            reader.readAsText(file);
-        }
-
-        // 頁面加載完成後初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化日期選擇器
-            initializeDateSelectors();
-            
-            // 加載存儲的數據
-            loadStoredData();
-            
-            // 轉換日期按鈕事件
-            document.getElementById('convert-date-btn').addEventListener('click', convertSolarToLunar);
-            
-            // 計算按鈕事件
-            document.getElementById('calculate-btn').addEventListener('click', calculateAndDisplayResults);
-            
-            // 標籤切換事件
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    switchTab(this.getAttribute('data-tab'));
-                });
-            });
-            
-            // 靈數按鈕事件
-            document.querySelectorAll('.number-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    showNumberInterpretation(parseInt(this.getAttribute('data-number')));
-                });
-            });
-            
-            // 編輯類型按鈕事件
-            document.querySelectorAll('.edit-type-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    switchEditType(this.getAttribute('data-type'));
-                });
-            });
-            
-            // 編輯靈數按鈕事件
-            document.querySelectorAll('.edit-number-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    showNumberEditForm(parseInt(this.getAttribute('data-number')));
-                });
-            });
-            
-            // 編輯流年按鈕事件
-            document.querySelectorAll('.edit-yearly-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    showYearlyEditForm(parseInt(this.getAttribute('data-number')));
-                });
-            });
-            
-            // 保存按鈕事件
-            document.getElementById('save-number-btn').addEventListener('click', saveNumberEdit);
-            document.getElementById('save-yearly-btn').addEventListener('click', saveYearlyEdit);
-            
-            // 匯出按鈕事件
-            document.getElementById('export-data-btn').addEventListener('click', exportData);
-            
-            // 匯入檔案事件
-            document.getElementById('import-file').addEventListener('change', function(e) {
-                if (this.files.length > 0) {
-                    const file = this.files[0];
-                    document.getElementById('file-name').textContent = file.name;
-                    importData(file);
-                }
-            });
-        });
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'960e9cfb80b6a331',t:'MTc1MjgwNjQxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
-// 匯出 JSON 檔案
-document.getElementById('export-data-btn').addEventListener('click', () => {
-    const data = {
-        numberInterpretations,
-        yearlyThemes
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'tarot-data.json';
-    a.click();
-
-    URL.revokeObjectURL(url);
-});
-
-// 匯入 JSON 檔案
-document.getElementById('import-file').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.numberInterpretations) {
-                numberInterpretations = data.numberInterpretations;
-                localStorage.setItem('numberInterpretations', JSON.stringify(numberInterpretations));
-            }
-            if (data.yearlyThemes) {
-                yearlyThemes = data.yearlyThemes;
-                localStorage.setItem('yearlyThemes', JSON.stringify(yearlyThemes));
-            }
-
-            document.getElementById('file-name').textContent = file.name;
-            alert('匯入成功！資料已更新並儲存至本地。');
-        } catch (error) {
-            alert('匯入失敗，檔案格式錯誤或內容無效。');
-        }
-    };
-    reader.readAsText(file);
-});
-
-</script>
-<!-- 防止右鍵、複製、開發者工具 -->
-<style>
-body {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-</style>
+    <script type="module" src="./js/numerology.js"></script>
 <script>
-// 禁止右鍵
-document.addEventListener("contextmenu", function (e) {
-  e.preventDefault();
-}, false);
-
-// 禁止選取文字
-document.addEventListener("selectstart", function (e) {
-  e.preventDefault();
-}, false);
-
-// 禁止快捷鍵
-document.addEventListener("keydown", function (e) {
-  // F12
-  if (e.key === "F12") {
-    e.preventDefault();
-  }
-  // Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U/S/C
-  if ((e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
-      (e.ctrlKey && (e.key === "U" || e.key === "S" || e.key === "C"))) {
-    e.preventDefault();
-  }
-}, false);
-
-// 清空 console
-console.log = function () {};
+if('serviceWorker'in navigator){
+ window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(err=>console.error('SW registration failed:',err));});
+}
 </script>
-
 </body>
 </html>
